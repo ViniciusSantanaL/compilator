@@ -16,6 +16,7 @@ public class Main {
         }
 
         if(ErrorHanlder.hasError()) {
+            System.out.println("-------PROGRAMA FINALIZADO-------");
             System.out.println(ErrorHanlder.printErrors());
             return;
         }
@@ -32,6 +33,7 @@ public class Main {
             syntaxAnalysis.parse();
             System.out.println("Análise sintática concluída com sucesso.");
         } catch (RuntimeException e) {
+            System.out.println("-------PROGRAMA FINALIZADO-------");
             System.out.println(ErrorHanlder.printErrors());
             return;
         }
@@ -46,7 +48,13 @@ public class Main {
             semanticAnalysis.analyze();
             System.out.println("Análise semântica concluída com sucesso!");
         } catch (RuntimeException e) {
+            System.out.println("-------PROGRAMA FINALIZADO-------");
             System.out.println(ErrorHanlder.printErrors());
+            return;
         }
+        System.out.println("-------PROGRAMA FINALIZADO-------");
+
+        System.out.println("SUCESSO NA EXECUÇÃO !!");
+
     }
 }

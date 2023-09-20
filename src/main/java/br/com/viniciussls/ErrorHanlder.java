@@ -8,8 +8,8 @@ public class ErrorHanlder {
     private static final String BASE_TEXT = "------------ERROS-----------------\n";
     private static final List<String> errosLits = new ArrayList<>();
 
-    public static void addMessage(String message) {
-        errosLits.add(message);
+    public static void addMessage(ErrorType errorType, String message) {
+        errosLits.add(errorType.getDescription() + ": " + message);
     }
 
     public static String printErrors() {

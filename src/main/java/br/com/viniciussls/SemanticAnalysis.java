@@ -24,23 +24,27 @@ public class SemanticAnalysis {
             System.out.println(String.format("Analisando token: %s", lexicalAnalysis.getCurrentToken().getSymbol()));
             lineNumber();
             command();
+            if (lexicalAnalysis.getCurrentToken().getSymbol() == Symbol.ENTER) {
+                lexicalAnalysis.nextToken(); // Pule o token ENTER
+            }
         }
         verifyGotoTargets();
     }
 
+
     private void lineNumber() {
         if (lexicalAnalysis.getCurrentToken().getSymbol() != Symbol.INTEGER) {
-            ErrorHanlder.addMessage("Esperado número de linha no início da expressão.");
+            ErrorHanlder.addMessage(ErrorType.SEMANTIC,"Esperado número de linha no início da expressão.");
             throw new RuntimeException();
         }
 
         int currentLineNumber = Integer.parseInt(lexicalAnalysis.getCurrentToken().getValue());
         if (currentLineNumber <= lastLineNumber) {
-            ErrorHanlder.addMessage("Número de linha " + currentLineNumber + " não está em ordem crescente ou foi repetido.");
+            ErrorHanlder.addMessage(ErrorType.SEMANTIC,"Número de linha " + currentLineNumber + " não está em ordem crescente ou foi repetido.");
             throw new RuntimeException();
         }
         if (lineNumbers.contains(currentLineNumber)) {
-            ErrorHanlder.addMessage("Número de linha " + currentLineNumber + " repetido.");
+            ErrorHanlder.addMessage(ErrorType.SEMANTIC,"Número de linha " + currentLineNumber + " repetido.");
             throw new RuntimeException();
         }
         lineNumbers.add(currentLineNumber);
@@ -68,12 +72,12 @@ public class SemanticAnalysis {
                 lexicalAnalysis.nextToken();
                 condition();
                 if (lexicalAnalysis.getCurrentToken().getSymbol() != Symbol.GOTO) {
-                    ErrorHanlder.addMessage("Esperado GOTO após condição.");
+                    ErrorHanlder.addMessage(ErrorType.SEMANTIC,"Esperado GOTO após condição.");
                     throw new RuntimeException();
                 }
                 lexicalAnalysis.nextToken();
                 if (lexicalAnalysis.getCurrentToken().getSymbol() != Symbol.INTEGER) {
-                    ErrorHanlder.addMessage("Número de linha esperado após GOTO.");
+                    ErrorHanlder.addMessage(ErrorType.SEMANTIC,"Número de linha esperado após GOTO.");
                     throw new RuntimeException();
                 }
                 gotoTargets.add(Integer.parseInt(lexicalAnalysis.getCurrentToken().getValue()));
@@ -82,7 +86,7 @@ public class SemanticAnalysis {
             case GOTO:
                 lexicalAnalysis.nextToken();
                 if (lexicalAnalysis.getCurrentToken().getSymbol() != Symbol.INTEGER) {
-                    ErrorHanlder.addMessage("Número de linha esperado após GOTO.");
+                    ErrorHanlder.addMessage(ErrorType.SEMANTIC,"Número de linha esperado após GOTO.");
                     throw new RuntimeException();
                 }
                 gotoTargets.add(Integer.parseInt(lexicalAnalysis.getCurrentToken().getValue()));
@@ -97,7 +101,7 @@ public class SemanticAnalysis {
                 // Não faz nada.
                 break;
             default:
-                ErrorHanlder.addMessage("Comando não reconhecido.");
+                ErrorHanlder.addMessage(ErrorType.SEMANTIC,"Comando não reconhecido.");
                 throw new RuntimeException();
         }
         System.out.printf("Expressão semântica %s analisada e válida!%n", lexicalAnalysis.getCurrentToken().getSymbol());
@@ -134,7 +138,7 @@ public class SemanticAnalysis {
                 currentSymbol == Symbol.GE || currentSymbol == Symbol.LE) {
             lexicalAnalysis.nextToken();
         } else {
-            ErrorHanlder.addMessage("Operador de comparação esperado.");
+            ErrorHanlder.addMessage(ErrorType.SEMANTIC,"Operador de comparação esperado.");
             throw new RuntimeException();
         }
     }
@@ -147,7 +151,7 @@ public class SemanticAnalysis {
         } else if (lexicalAnalysis.getCurrentToken().getSymbol() == Symbol.INTEGER) {
             lexicalAnalysis.nextToken(); // Avance o token após o INTEGER
         } else {
-            ErrorHanlder.addMessage("Token inesperado em factor: " + lexicalAnalysis.getCurrentToken().getSymbol());
+            ErrorHanlder.addMessage(ErrorType.SEMANTIC,"Token inesperado em factor: " + lexicalAnalysis.getCurrentToken().getSymbol());
             throw new RuntimeException();
         }
     }
@@ -165,7 +169,7 @@ public class SemanticAnalysis {
 
     private void useVariable(String varName) {
         if (!declaredVariables.contains(varName)) {
-            ErrorHanlder.addMessage("Variável " + varName + " não foi declarada.");
+            ErrorHanlder.addMessage(ErrorType.SEMANTIC,"Variável " + varName + " não foi declarada.");
             throw new RuntimeException();
         }
     }
@@ -173,7 +177,7 @@ public class SemanticAnalysis {
     private void verifyGotoTargets() {
         for (int target : gotoTargets) {
             if (!lineNumbers.contains(target)) {
-                ErrorHanlder.addMessage("GOTO para linha " + target + " que não existe.");
+                ErrorHanlder.addMessage(ErrorType.SEMANTIC,"GOTO para linha " + target + " que não existe.");
                 throw new RuntimeException();
             }
         }

@@ -24,6 +24,7 @@ public enum Symbol {
     PRINT ("print"),
     GOTO ("goto"),
     IF ("if"),
+    ENTER("\n"),
     END ("end"),
     ERROR ("");
 

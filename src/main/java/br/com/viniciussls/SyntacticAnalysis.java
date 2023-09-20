@@ -27,8 +27,11 @@ public class SyntacticAnalysis {
     }
 
     private void lineNumber() {
+        while (lexicalAnalysis.getCurrentToken().getSymbol() == Symbol.ENTER) {
+            lexicalAnalysis.nextToken();
+        }
         if (lexicalAnalysis.getCurrentToken().getSymbol() != Symbol.INTEGER) {
-            ErrorHanlder.addMessage("Esperado número de linha no início da expressão.");
+            ErrorHanlder.addMessage(ErrorType.SYNTACTIC,"Esperado número de linha no início da expressão.");
             throw new RuntimeException();
         }
         lexicalAnalysis.nextToken();
@@ -65,14 +68,15 @@ public class SyntacticAnalysis {
                 expect(Symbol.INTEGER);
                 break;
             case END:
-                // Não faz nada, apenas termina
-                break;
+
+                return;
             default:
-                ErrorHanlder.addMessage("Comando não reconhecido, numero de linha vazio: " + lexicalAnalysis.getCurrentToken().getSymbol());
+                ErrorHanlder.addMessage(ErrorType.SYNTACTIC,"Comando não reconhecido, numero de linha vazio: " + lexicalAnalysis.getCurrentToken().getSymbol());
                 throw new RuntimeException();
         }
         System.out.printf("Expressão %s analisada e válida!%n", lexicalAnalysis.getCurrentToken().getSymbol());
-        lexicalAnalysis.nextToken();
+        expect(Symbol.ENTER);
+
     }
 
     private void expression() {
@@ -103,11 +107,12 @@ public class SyntacticAnalysis {
             if (lexicalAnalysis.getCurrentToken().getSymbol() == Symbol.INTEGER) {
                 lexicalAnalysis.nextToken();
             } else {
-                ErrorHanlder.addMessage("Número esperado após o sinal '-'.");
+                ErrorHanlder.addMessage(ErrorType.SYNTACTIC,"Número esperado após o sinal '-'.");
                 throw new RuntimeException();
             }
         } else {
-            ErrorHanlder.addMessage("Fator não reconhecido.");
+            ErrorHanlder.addMessage(ErrorType.SYNTACTIC,
+                    "Fator não reconhecido. Esperado: VARIABLE, INTEGER ou '-' seguido por INTEGER. Encontrado: " + lexicalAnalysis.getCurrentToken().getSymbol() + " com valor: " + lexicalAnalysis.getCurrentToken().getValue() + ".");
             throw new RuntimeException();
         }
     }
@@ -125,14 +130,16 @@ public class SyntacticAnalysis {
                 expression();
                 break;
             default:
-                ErrorHanlder.addMessage("Operador condicional não reconhecido.");
+                ErrorHanlder.addMessage(ErrorType.SYNTACTIC,
+                        "Operador condicional não reconhecido. Encontrado: " + lexicalAnalysis.getCurrentToken().getSymbol() + " com valor: " + lexicalAnalysis.getCurrentToken().getValue() +
+                                ". Operadores condicionais válidos são: >, >=, <, <=, ==, !=.");
                 throw new RuntimeException();
         }
     }
 
     private void expect(Symbol expectedSymbol) {
         if (lexicalAnalysis.getCurrentToken().getSymbol() != expectedSymbol) {
-            ErrorHanlder.addMessage("Token esperado: " + expectedSymbol + ", mas foi encontrado: " + lexicalAnalysis.getCurrentToken().getSymbol());
+            ErrorHanlder.addMessage(ErrorType.SYNTACTIC,"Token esperado: " + expectedSymbol + ", mas foi encontrado: " + lexicalAnalysis.getCurrentToken().getSymbol());
             throw new RuntimeException();
         }
 

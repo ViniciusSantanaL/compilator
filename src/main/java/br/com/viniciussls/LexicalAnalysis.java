@@ -5,9 +5,9 @@ import java.util.List;
 
 public class LexicalAnalysis {
 
-    private static final List<Character> ignoreChars = Arrays.asList(' ', '\r', '\t', '\n');
+    private static final List<Character> ignoreChars = Arrays.asList(' ', '\r', '\t');
 
-    private static final List<Character> operators = Arrays.asList('-','=', '+', '*', '/', '<', '>', '%');
+    private static final List<Character> operators = Arrays.asList('-','=', '+', '*', '/', '<', '>', '%', '\n');
 
     private final String code;
 
@@ -17,8 +17,6 @@ public class LexicalAnalysis {
 
     private Token currentToken;
 
-    private Token previousToken;
-
     public LexicalAnalysis(String codigo) {
         this.code = codigo;
         this.currentIndex = 0;
@@ -27,7 +25,6 @@ public class LexicalAnalysis {
 
     public boolean nextToken() {
         while(!isFinish()) {
-            this.previousToken = this.currentToken;
 
             final char actualChar = code.charAt(currentIndex);
             if(ignoreChars.contains(actualChar)) {
@@ -48,7 +45,7 @@ public class LexicalAnalysis {
             } else if (Character.isDigit(actualChar)) {
                 currentToken = new Token(Symbol.INTEGER, readInteger());
             } else {
-                ErrorHanlder.addMessage("Token não mapeado: " + actualChar);
+                ErrorHanlder.addMessage(ErrorType.LEXICAL,"Token não mapeado: " + actualChar);
                 return false;
             }
             return true;
@@ -59,14 +56,12 @@ public class LexicalAnalysis {
     public Token peekNextToken() {
         int tempIndex = currentIndex;
         Token tempCurrentToken = currentToken;
-        Token tempPreviousToken = previousToken;
 
         nextToken();
         Token next = currentToken;
 
         currentIndex = tempIndex;
         currentToken = tempCurrentToken;
-        previousToken = tempPreviousToken;
 
         return next;
     }
@@ -139,10 +134,6 @@ public class LexicalAnalysis {
 
     public Token getCurrentToken() {
         return currentToken;
-    }
-
-    public Token getPreviousToken() {
-        return previousToken;
     }
 
     public boolean isFinish() {
