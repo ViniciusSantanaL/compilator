@@ -6,7 +6,7 @@ Projeto acadêmico, feito em Java, para compilar a linguagem SIMPLE
 | Vinicius Santana Leão da Silva | 2012130043 |
 | Vinícius Moreira de Carvalho | 2122130022 |
 
-## Referencia da Linguagem SIMPLE
+## Referência da Linguagem SIMPLE
 http://www.ybadoo.com.br/tutoriais/cmp/11/
 
 ## Dependencias necessárias
