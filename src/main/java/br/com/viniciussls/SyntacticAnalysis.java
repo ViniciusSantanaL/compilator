@@ -12,24 +12,23 @@ public class SyntacticAnalysis {
         lexicalAnalysis.nextToken();
         while (lexicalAnalysis.getCurrentToken().getSymbol() != Symbol.END) {
             System.out.printf("Analisando token: %s%n", lexicalAnalysis.getCurrentToken().getSymbol());
-            if (isNextTokenACommand()) {
+            if (isPreviousTokenEnterOrStart()) {
                 lineNumber();  // Garantir que o começo de cada expressão tem um número de linha.
             }
             command();
         }
     }
+    public boolean isPreviousTokenEnterOrStart() {
+        Token previousToken = lexicalAnalysis.getPreviousToken();
 
-    private boolean isNextTokenACommand() {
-        Symbol nextSymbol = lexicalAnalysis.peekNextToken().getSymbol();
-        return nextSymbol == Symbol.REM || nextSymbol == Symbol.INPUT || nextSymbol == Symbol.LET ||
-                nextSymbol == Symbol.PRINT || nextSymbol == Symbol.GOTO || nextSymbol == Symbol.IF ||
-                nextSymbol == Symbol.END;
+        if (previousToken == null) {
+            return true;
+        }
+
+        return previousToken.getSymbol() == Symbol.ENTER;
     }
 
     private void lineNumber() {
-        while (lexicalAnalysis.getCurrentToken().getSymbol() == Symbol.ENTER) {
-            lexicalAnalysis.nextToken();
-        }
         if (lexicalAnalysis.getCurrentToken().getSymbol() != Symbol.INTEGER) {
             ErrorHanlder.addMessage(ErrorType.SYNTACTIC,"Esperado número de linha no início da expressão.");
             throw new RuntimeException();
@@ -41,7 +40,7 @@ public class SyntacticAnalysis {
         System.out.printf("Analisando expressão: %s%n", lexicalAnalysis.getCurrentToken().getSymbol());
         switch (lexicalAnalysis.getCurrentToken().getSymbol()) {
             case REM:
-                // Pula o comentário
+                lexicalAnalysis.nextToken();
                 break;
             case INPUT:
                 lexicalAnalysis.nextToken();

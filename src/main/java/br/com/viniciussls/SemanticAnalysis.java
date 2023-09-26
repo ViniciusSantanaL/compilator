@@ -56,6 +56,9 @@ public class SemanticAnalysis {
     private void command() {
         System.out.printf("Analisando expressão semântica: %s%n", lexicalAnalysis.getCurrentToken().getSymbol());
         switch (lexicalAnalysis.getCurrentToken().getSymbol()) {
+            case REM:
+                lexicalAnalysis.nextToken();
+                break;
             case INPUT:
                 lexicalAnalysis.nextToken();
                 declareVariable(lexicalAnalysis.getCurrentToken().getValue());

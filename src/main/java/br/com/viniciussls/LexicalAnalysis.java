@@ -17,6 +17,8 @@ public class LexicalAnalysis {
 
     private Token currentToken;
 
+    private Token previousToken;
+
     public LexicalAnalysis(String codigo) {
         this.code = codigo;
         this.currentIndex = 0;
@@ -25,7 +27,7 @@ public class LexicalAnalysis {
 
     public boolean nextToken() {
         while(!isFinish()) {
-
+            this.previousToken = this.currentToken;
             final char actualChar = code.charAt(currentIndex);
             if(ignoreChars.contains(actualChar)) {
                 skipBlankSpaces();
@@ -52,20 +54,6 @@ public class LexicalAnalysis {
         }
         return false;
     }
-
-    public Token peekNextToken() {
-        int tempIndex = currentIndex;
-        Token tempCurrentToken = currentToken;
-
-        nextToken();
-        Token next = currentToken;
-
-        currentIndex = tempIndex;
-        currentToken = tempCurrentToken;
-
-        return next;
-    }
-
 
     private Symbol readSymbol() {
         if(operators.contains(code.charAt(currentIndex))) {
@@ -134,6 +122,10 @@ public class LexicalAnalysis {
 
     public Token getCurrentToken() {
         return currentToken;
+    }
+
+    public Token getPreviousToken() {
+        return previousToken;
     }
 
     public boolean isFinish() {
