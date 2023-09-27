@@ -83,6 +83,14 @@ public class SyntacticAnalysis {
         while (lexicalAnalysis.getCurrentToken().getSymbol() == Symbol.ADD ||
                 lexicalAnalysis.getCurrentToken().getSymbol() == Symbol.SUBTRACT) {
             lexicalAnalysis.nextToken();
+            if(lexicalAnalysis.peekNextToken().getSymbol() == Symbol.MULTIPLY ||
+                    lexicalAnalysis.peekNextToken().getSymbol() == Symbol.DIVIDE ||
+                    lexicalAnalysis.peekNextToken().getSymbol() == Symbol.MODULO ||
+                    lexicalAnalysis.peekNextToken().getSymbol() == Symbol.ADD ||
+                    lexicalAnalysis.peekNextToken().getSymbol() == Symbol.SUBTRACT) {
+                ErrorHanlder.addMessage(ErrorType.SYNTACTIC,"Só é possível fazer uma operação com os operadores por linha.");
+                throw new RuntimeException();
+            }
             term();
         }
     }
@@ -92,7 +100,17 @@ public class SyntacticAnalysis {
         while (lexicalAnalysis.getCurrentToken().getSymbol() == Symbol.MULTIPLY ||
                 lexicalAnalysis.getCurrentToken().getSymbol() == Symbol.DIVIDE ||
                 lexicalAnalysis.getCurrentToken().getSymbol() == Symbol.MODULO) {
+
             lexicalAnalysis.nextToken();
+            System.out.println("token tal " + lexicalAnalysis.getCurrentToken().getSymbol());
+            if(lexicalAnalysis.peekNextToken().getSymbol() == Symbol.MULTIPLY ||
+                    lexicalAnalysis.peekNextToken().getSymbol() == Symbol.DIVIDE ||
+                    lexicalAnalysis.peekNextToken().getSymbol() == Symbol.MODULO ||
+                    lexicalAnalysis.peekNextToken().getSymbol() == Symbol.ADD ||
+                    lexicalAnalysis.peekNextToken().getSymbol() == Symbol.SUBTRACT) {
+                ErrorHanlder.addMessage(ErrorType.SYNTACTIC,"Só é possível fazer uma operação com os operadores por linha.");
+                throw new RuntimeException();
+            }
             factor();
         }
     }

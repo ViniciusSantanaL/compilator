@@ -55,6 +55,21 @@ public class LexicalAnalysis {
         return false;
     }
 
+    public Token peekNextToken() {
+        int tempIndex = currentIndex;
+        Token tempCurrentToken = currentToken;
+        Token tempPreviousToken = previousToken;
+
+        nextToken();
+        Token next = currentToken;
+
+        currentIndex = tempIndex;
+        currentToken = tempCurrentToken;
+        previousToken = tempPreviousToken;
+
+        return next;
+    }
+
     private Symbol readSymbol() {
         if(operators.contains(code.charAt(currentIndex))) {
             return readOperatorSymbol();
