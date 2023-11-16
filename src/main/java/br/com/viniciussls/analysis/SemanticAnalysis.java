@@ -1,4 +1,7 @@
-package br.com.viniciussls;
+package br.com.viniciussls.analysis;
+
+import br.com.viniciussls.exception.ErrorHanlder;
+import br.com.viniciussls.exception.ErrorType;
 
 import java.util.HashSet;
 import java.util.Set;

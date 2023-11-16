@@ -1,4 +1,4 @@
-package br.com.viniciussls;
+package br.com.viniciussls.analysis;
 
 public class Token {
 

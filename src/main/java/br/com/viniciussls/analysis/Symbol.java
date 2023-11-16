@@ -1,4 +1,4 @@
-package br.com.viniciussls;
+package br.com.viniciussls.analysis;
 
 import java.util.HashMap;
 import java.util.Map;

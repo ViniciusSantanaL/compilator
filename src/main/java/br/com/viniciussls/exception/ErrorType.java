@@ -1,4 +1,4 @@
-package br.com.viniciussls;
+package br.com.viniciussls.exception;
 
 public enum ErrorType {
     LEXICAL("Erro Léxico"),

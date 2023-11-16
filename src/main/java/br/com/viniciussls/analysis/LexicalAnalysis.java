@@ -1,4 +1,7 @@
-package br.com.viniciussls;
+package br.com.viniciussls.analysis;
+
+import br.com.viniciussls.exception.ErrorHanlder;
+import br.com.viniciussls.exception.ErrorType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -147,4 +150,9 @@ public class LexicalAnalysis {
         return currentIndex >= codeLength;
     }
 
+    public void reset() {
+        this.currentIndex = 0;
+        this.previousToken = null;
+        this.currentToken = null;
+    }
 }

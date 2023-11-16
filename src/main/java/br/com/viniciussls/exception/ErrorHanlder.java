@@ -1,4 +1,4 @@
-package br.com.viniciussls;
+package br.com.viniciussls.exception;
 
 import java.util.ArrayList;
 import java.util.List;
