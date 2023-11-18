@@ -7,8 +7,8 @@ import br.com.viniciussls.utils.FileUtils;
 public class Main {
 
     public static void main(String[] args) {
-        AnalysisExecute analysisExecute = new AnalysisExecute();
-        analysisExecute.run();
+//        AnalysisExecute analysisExecute = new AnalysisExecute();
+//        analysisExecute.run();
 
         SynthesisExecution synthesisExecution = new SynthesisExecution();
         synthesisExecution.run();

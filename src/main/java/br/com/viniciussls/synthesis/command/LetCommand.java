@@ -3,10 +3,7 @@ package br.com.viniciussls.synthesis.command;
 import br.com.viniciussls.analysis.LexicalAnalysis;
 import br.com.viniciussls.analysis.Symbol;
 import br.com.viniciussls.analysis.Token;
-import br.com.viniciussls.synthesis.GoToRedirect;
-import br.com.viniciussls.synthesis.Operation;
-import br.com.viniciussls.synthesis.PairCommand;
-import br.com.viniciussls.synthesis.SynthesisExecution;
+import br.com.viniciussls.synthesis.*;
 
 import static br.com.viniciussls.synthesis.SynthesisExecution.addToCommandList;
 import static br.com.viniciussls.synthesis.SynthesisExecution.getListMemmory;
@@ -45,8 +42,9 @@ public class LetCommand implements Command {
             // Se o lado direito é apenas outra variável.
             Integer rightVariableMemPos = getListMemmory().allocVariable(rightSideToken.getValue(), 0);
             // Gera código para carregar o valor da variável direita e armazenar na esquerda.
-            addToCommandList(new PairCommand(Operation.LOAD, rightVariableMemPos));
-            addToCommandList(new PairCommand(Operation.STORE, leftVariableMemPos));
+            addToCommandList(StackOperation.push(Operation.LOAD, rightVariableMemPos));
+            addToCommandList(StackOperation.push(Operation.STORE, leftVariableMemPos));
+
         } else {
             // Se o lado direito é uma expressão aritmética.
             processArithmeticExpression(lexicalAnalysis, leftVariableMemPos);
@@ -64,9 +62,9 @@ public class LetCommand implements Command {
                     GoToRedirect.registerLineNumber(simpleLine, PairCommand.getLineCount());
                     Integer memmoryPosition = getListMemmory().allocConst(constant);
                     Integer variableMemmoryPosition = getListMemmory().allocVariable(variable, 0);
-                    addToCommandList(new PairCommand(Operation.LOAD, variableMemmoryPosition));
-                    addToCommandList(new PairCommand(Operation.ADD, memmoryPosition));
-                    addToCommandList(new PairCommand(Operation.STORE, variableMemmoryPosition));
+                    addToCommandList(StackOperation.push(Operation.LOAD, variableMemmoryPosition));
+                    addToCommandList(StackOperation.push(Operation.ADD, memmoryPosition));
+                    addToCommandList(StackOperation.push(Operation.STORE, variableMemmoryPosition));
                 }
                 lexicalAnalysis.nextToken(); // jump integer
                 return true;
@@ -88,7 +86,7 @@ public class LetCommand implements Command {
         Integer secondOperandPos = getOperandPosition(lexicalAnalysis.getCurrentToken());
 
         // Agora, gera o código SML com base no operador.
-        generateArithmeticCode(operator, firstOperandPos, secondOperandPos, leftVariableMemPos);
+        generateArithmeticCode(operator, firstOperandPos, secondOperandPos, leftVariableMemPos, lexicalAnalysis);
 
         // Avança para o próximo token após a expressão aritmética.
         lexicalAnalysis.nextToken();
@@ -105,30 +103,28 @@ public class LetCommand implements Command {
         }
     }
 
-    private void generateArithmeticCode(Symbol operator, Integer firstOperandPos, Integer secondOperandPos, Integer resultPos) {
-        SynthesisExecution.addToCommandList(new PairCommand(Operation.LOAD, firstOperandPos));
-
+    private void generateArithmeticCode(Symbol operator, Integer firstOperandPos, Integer secondOperandPos, Integer resultPos, LexicalAnalysis lexicalAnalysis) {
+        addToCommandList(StackOperation.push(Operation.LOAD, firstOperandPos));
         switch (operator) {
             case ADD:
-                SynthesisExecution.addToCommandList(new PairCommand(Operation.ADD, secondOperandPos));
+                addToCommandList(StackOperation.push(Operation.ADD, secondOperandPos));
                 break;
             case SUBTRACT:
-                SynthesisExecution.addToCommandList(new PairCommand(Operation.SUBTRACT, secondOperandPos));
+                addToCommandList(StackOperation.push(Operation.SUBTRACT, secondOperandPos));
                 break;
             case MULTIPLY:
-                SynthesisExecution.addToCommandList(new PairCommand(Operation.MULTIPLY, secondOperandPos));
+                addToCommandList(StackOperation.push(Operation.MULTIPLY, secondOperandPos));
                 break;
             case DIVIDE:
-                SynthesisExecution.addToCommandList(new PairCommand(Operation.DIVIDE, secondOperandPos));
+                addToCommandList(StackOperation.push(Operation.DIVIDE, secondOperandPos));
                 break;
             case MODULO:
-                SynthesisExecution.addToCommandList(new PairCommand(Operation.MODULE, secondOperandPos));
+                addToCommandList(StackOperation.push(Operation.MODULE, secondOperandPos));
                 break;
             default:
-                throw new IllegalStateException("Unsupported arithmetic operation: " + operator);
+                throw new IllegalStateException("Unsupported arithmetic operation: " + operator + " token anterior: " + lexicalAnalysis.peekNextToken().getSymbol());
         }
-
-        SynthesisExecution.addToCommandList(new PairCommand(Operation.STORE, resultPos));
+        addToCommandList(StackOperation.push(Operation.STORE, resultPos));
     }
 
 

@@ -37,18 +37,27 @@ public class LexicalAnalysis {
                 continue;
             } else if(actualChar == 'r' && (currentIndex + 3 < codeLength) && code.startsWith("rem", currentIndex)) {
                 currentToken = new Token(Symbol.REM, "rem");
+                System.out.println("Token atual: " + currentToken.getValue());
                 currentIndex += 4;
                 skipComment();
+            } else if(actualChar == '-' && previousToken.getSymbol() == Symbol.ASSIGNMENT) {
+                currentIndex++;
+
+                currentToken = new Token(Symbol.INTEGER, '-' + readInteger());
+
             } else if ((Character.isLetter(actualChar) && Character.isLowerCase(actualChar)) || operators.contains(actualChar)) {
                 Symbol symbol = readSymbol();
                 if (symbol == null) {
                     currentToken = new Token(Symbol.VARIABLE, String.valueOf(code.charAt(currentIndex)));
+                    System.out.println("Token atual: " + currentToken.getValue());
                     currentIndex++;
                 } else {
                     currentToken = new Token(symbol, symbol.getSymbol());
+                    System.out.println("Token atual: " + currentToken.getValue());
                 }
             } else if (Character.isDigit(actualChar)) {
                 currentToken = new Token(Symbol.INTEGER, readInteger());
+                System.out.println("Token atual: " + currentToken.getValue());
             } else {
                 ErrorHanlder.addMessage(ErrorType.LEXICAL,"Token não mapeado: " + actualChar);
                 return false;
@@ -57,6 +66,7 @@ public class LexicalAnalysis {
         }
         return false;
     }
+
 
     public Token peekNextToken() {
         int tempIndex = currentIndex;

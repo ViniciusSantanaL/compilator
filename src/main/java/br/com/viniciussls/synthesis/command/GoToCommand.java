@@ -4,6 +4,7 @@ import br.com.viniciussls.analysis.LexicalAnalysis;
 import br.com.viniciussls.synthesis.GoToRedirect;
 import br.com.viniciussls.synthesis.Operation;
 import br.com.viniciussls.synthesis.PairCommand;
+import br.com.viniciussls.synthesis.StackOperation;
 
 import static br.com.viniciussls.synthesis.SynthesisExecution.addToCommandList;
 
@@ -22,7 +23,7 @@ public class GoToCommand implements Command {
         Integer goToLineNumber = Integer.valueOf(lexicalAnalysis.getCurrentToken().getValue());
 
         GoToRedirect.addGotoForUpdate(PairCommand.getLineCount(), goToLineNumber);
-        addToCommandList(new PairCommand(Operation.BRANCH, goToLineNumber));
+        addToCommandList(StackOperation.push(Operation.BRANCH, goToLineNumber));
     }
 
     public static GoToCommand getInstance() {

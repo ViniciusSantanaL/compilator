@@ -12,9 +12,11 @@ public class PairVariable {
     }
 
     public String getVariableExpression() {
-        Character signal = initialValue >= 0 ? '+' : '-';
-        String valueFormat = String.format("%04d", initialValue);
-        return signal + valueFormat;
+        if(initialValue >= 0) {
+            return  '+' + String.format("%04d", initialValue);
+        } else {
+            return String.format("%05d", initialValue);
+        }
     }
 
     public void changeInitialValue(Integer value) {

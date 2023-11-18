@@ -19,7 +19,7 @@ public class SynthesisExecution {
     private final CommandContext commandContext;
 
     public SynthesisExecution() {
-        LexicalAnalysis  lexicalAnalysis = new LexicalAnalysis(FileUtils.getFileMapToString());
+        LexicalAnalysis  lexicalAnalysis = new LexicalAnalysis(FileUtils.getFileMapToString().toLowerCase());
         this.commandContext = new CommandContext(lexicalAnalysis);
         this.lexicalAnalysis = lexicalAnalysis;
     }
@@ -62,7 +62,7 @@ public class SynthesisExecution {
     }
 
     public static void addToCommandList(PairCommand pair) {
-        commands.add(pair);
+        Optional.of(pair).ifPresent(item -> commands.add(item));
     }
 
     public static ListMemmory getListMemmory() {

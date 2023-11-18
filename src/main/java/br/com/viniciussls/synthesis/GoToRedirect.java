@@ -23,6 +23,7 @@ public class GoToRedirect {
         for(Map.Entry<Integer, Integer> entry: GOTOS_FOR_UPDATE.entrySet()) {
             int goToLineNumber = entry.getKey();
             int oldRedirectLineNumber = entry.getValue();
+            System.out.println("GoTo da linha sml" + goToLineNumber + ", que redireciona para linha do SIMPLE" + oldRedirectLineNumber);
             int newRedirectLineNumber = SIMPLE_TO_SML_LINE_MAPPING.get(oldRedirectLineNumber);
             PairCommand pairCommand = listMemmory.stream()
                                     .filter(item -> item.getLineNumber() == goToLineNumber)
