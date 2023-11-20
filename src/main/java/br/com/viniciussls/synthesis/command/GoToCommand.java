@@ -23,7 +23,7 @@ public class GoToCommand implements Command {
         Integer goToLineNumber = Integer.valueOf(lexicalAnalysis.getCurrentToken().getValue());
 
         GoToRedirect.addGotoForUpdate(PairCommand.getLineCount(), goToLineNumber);
-        addToCommandList(StackOperation.push(Operation.BRANCH, goToLineNumber));
+        addToCommandList(StackOperation.push(Operation.BRANCH, goToLineNumber.toString()));
     }
 
     public static GoToCommand getInstance() {

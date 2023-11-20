@@ -10,11 +10,13 @@ public class PairCommand {
 
     private Integer memmoryPosition;
 
+    private String variable;
+
     private PairVariable pairVariable;
 
-    public PairCommand(Operation operation, Integer memmoryPosition) {
+    public PairCommand(Operation operation, String variable) {
         this.operation = operation;
-        this.memmoryPosition = memmoryPosition;
+        this.variable = variable;
         this.lineNumber = commandSize;
         commandSize++;
     }
@@ -29,9 +31,9 @@ public class PairCommand {
         return pairVariable == null ? getCommandExpression() : pairVariable.getVariableExpression();
     }
     private String getCommandExpression() {
-        String memmoryPositionFormat = String.format("%02d", getMemmoryPosition());
+        String memmoryPositionFormat = getMemmoryPosition() == null ? null : String.format("%02d", getMemmoryPosition());
         String signal = "+";
-        return signal.concat(operation.getValue().toString()).concat(memmoryPositionFormat);
+        return signal.concat(operation.getValue().toString()).concat(memmoryPositionFormat == null ? "00": memmoryPositionFormat);
     }
 
     public void setMemmoryPosition(Integer memmoryPosition) {
@@ -48,5 +50,9 @@ public class PairCommand {
 
     public Integer getLineNumber() {
         return lineNumber;
+    }
+
+    public String getVariable() {
+        return variable;
     }
 }

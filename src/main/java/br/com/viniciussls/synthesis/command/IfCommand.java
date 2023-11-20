@@ -25,7 +25,8 @@ public class IfCommand implements Command {
         GoToRedirect.registerLineNumber(simpleLine, PairCommand.getLineCount());
         // Pula o 'if'
         lexicalAnalysis.nextToken();
-        Integer leftVariableMemPos = getOperandPosition(lexicalAnalysis.getCurrentToken());
+        getListMemmory().allocVariable(lexicalAnalysis.getCurrentToken());
+        String leftVariableMemPos = lexicalAnalysis.getCurrentToken().getValue();
 
         // Avança para o operador relacional
         lexicalAnalysis.nextToken();
@@ -33,7 +34,8 @@ public class IfCommand implements Command {
 
         // Avança para a segunda variável da condição
         lexicalAnalysis.nextToken();
-        Integer rightVariableMemPos = getOperandPosition(lexicalAnalysis.getCurrentToken());
+        getListMemmory().allocVariable(lexicalAnalysis.getCurrentToken());
+        String rightVariableMemPos = lexicalAnalysis.getCurrentToken().getValue();
 
         // Avança para 'goto'
         lexicalAnalysis.nextToken();
@@ -49,62 +51,52 @@ public class IfCommand implements Command {
         lexicalAnalysis.nextToken();
     }
 
-    private void generateConditionalCode(Symbol condition, Integer leftMemPos, Integer rightMemPos, Integer goToLine) {
+    private void generateConditionalCode(Symbol condition, String leftMemPos, String rightMemPos, Integer goToLine) {
         switch (condition) {
             case EQ: // ==
                 addToCommandList(StackOperation.push(Operation.LOAD, leftMemPos));
                 addToCommandList(StackOperation.push(Operation.SUBTRACT, rightMemPos));
                 GoToRedirect.addGotoForUpdate(PairCommand.getLineCount(), goToLine);
-                addToCommandList(StackOperation.push(Operation.BRANCHZERO, goToLine));
+                addToCommandList(StackOperation.push(Operation.BRANCHZERO, goToLine.toString()));
                 break;
             case NE: // !=
                 addToCommandList(StackOperation.push(Operation.LOAD, leftMemPos));
                 addToCommandList(StackOperation.push(Operation.SUBTRACT, rightMemPos));
                 int branchOverLine = PairCommand.getLineCount() + 2; // Próxima linha depois do BRANCHZERO.
-                addToCommandList(StackOperation.push(Operation.BRANCHZERO, branchOverLine));
+                addToCommandList(StackOperation.push(Operation.BRANCHZERO, String.valueOf(branchOverLine)));
                 GoToRedirect.addGotoForUpdate(PairCommand.getLineCount(), goToLine);
-                addToCommandList(StackOperation.push(Operation.BRANCH, goToLine));
+                addToCommandList(StackOperation.push(Operation.BRANCH, goToLine.toString()));
                 break;
             case GT: // >
                 addToCommandList(StackOperation.push(Operation.LOAD, rightMemPos));
                 addToCommandList(StackOperation.push(Operation.SUBTRACT, leftMemPos));
-                addToCommandList(StackOperation.push(Operation.BRANCHNEG, goToLine));
+                GoToRedirect.addGotoForUpdate(PairCommand.getLineCount(), goToLine);
+                addToCommandList(StackOperation.push(Operation.BRANCHNEG, goToLine.toString()));
                 break;
             case LT: // < ;
                 addToCommandList(StackOperation.push(Operation.LOAD, leftMemPos));
                 addToCommandList(StackOperation.push(Operation.SUBTRACT, rightMemPos));
                 GoToRedirect.addGotoForUpdate(PairCommand.getLineCount(), goToLine);
-                addToCommandList(StackOperation.push(Operation.BRANCHNEG, goToLine));
+                addToCommandList(StackOperation.push(Operation.BRANCHNEG, goToLine.toString()));
                 break;
             case GE: // >=
                 addToCommandList(StackOperation.push(Operation.LOAD, rightMemPos));
                 addToCommandList(StackOperation.push(Operation.SUBTRACT, leftMemPos));
                 GoToRedirect.addGotoForUpdate(PairCommand.getLineCount(), goToLine);
-                addToCommandList(StackOperation.push(Operation.BRANCHNEG, goToLine));
+                addToCommandList(StackOperation.push(Operation.BRANCHNEG, goToLine.toString()));
                 GoToRedirect.addGotoForUpdate(PairCommand.getLineCount(), goToLine);
-                addToCommandList(StackOperation.push(Operation.BRANCHZERO, goToLine));
+                addToCommandList(StackOperation.push(Operation.BRANCHZERO, goToLine.toString()));
                 break;
             case LE: // <=
                 addToCommandList(StackOperation.push(Operation.LOAD, leftMemPos));
                 addToCommandList(StackOperation.push(Operation.SUBTRACT, rightMemPos));
                 GoToRedirect.addGotoForUpdate(PairCommand.getLineCount(), goToLine);
-                addToCommandList(StackOperation.push(Operation.BRANCHNEG, goToLine));
+                addToCommandList(StackOperation.push(Operation.BRANCHNEG, goToLine.toString()));
                 GoToRedirect.addGotoForUpdate(PairCommand.getLineCount(), goToLine);
-                addToCommandList(StackOperation.push(Operation.BRANCHZERO, goToLine));
+                addToCommandList(StackOperation.push(Operation.BRANCHZERO, goToLine.toString()));
                 break;
             default:
                 throw new IllegalStateException("Unsupported relational operation: " + condition);
-        }
-    }
-
-    private Integer getOperandPosition(Token token) {
-        // Se o token for um número, aloca uma constante.
-        if (token.getSymbol() == Symbol.INTEGER) {
-            Integer value = Integer.valueOf(token.getValue());
-            return getListMemmory().allocConst(value);
-        } else {
-            // Se for uma variável, recupera sua posição de memória.
-            return getListMemmory().allocVariable(token.getValue(), 0);
         }
     }
 

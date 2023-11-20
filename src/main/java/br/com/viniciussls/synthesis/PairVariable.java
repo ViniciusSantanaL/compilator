@@ -4,10 +4,10 @@ public class PairVariable {
 
     private Integer initialValue;
 
-    private final Integer positionAux;
+    private final String variable;
 
-    public PairVariable(Integer positionAux, Integer initialValue) {
-        this.positionAux = positionAux;
+    public PairVariable(String variable, Integer initialValue) {
+        this.variable = variable;
         this.initialValue = initialValue;
     }
 
@@ -23,7 +23,7 @@ public class PairVariable {
         this.initialValue = value;
     }
 
-    public Integer getPositionAux() {
-        return positionAux;
+    public String getVariable() {
+        return variable;
     }
 }

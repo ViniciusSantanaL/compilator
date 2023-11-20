@@ -15,7 +15,7 @@ public class EndCommand implements Command {
     public void interpreteCommand(LexicalAnalysis lexicalAnalysis) {
         Integer simpleLine = Integer.parseInt(lexicalAnalysis.getPreviousToken().getValue());
         GoToRedirect.registerLineNumber(simpleLine, PairCommand.getLineCount());
-        addToCommandList(StackOperation.push(Operation.HALT, 0));
+        addToCommandList(StackOperation.push(Operation.HALT, ""));
     }
 
     public static EndCommand getInstance() {

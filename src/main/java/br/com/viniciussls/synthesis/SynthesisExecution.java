@@ -50,14 +50,17 @@ public class SynthesisExecution {
 
     private void insertVariables() {
         List<PairCommand> listAux = new ArrayList<>();
-        listMemmory.getMemmoryList().forEach(item -> {
-            listAux.add(new PairCommand(item));
-            commands.forEach(pair -> {
-                if(Objects.equals(pair.getMemmoryPosition(), item.getPositionAux())) {
-                    pair.setMemmoryPosition(commands.size() - 1);
+        for(PairVariable pairVariable : listMemmory.getMemmoryList()) {
+            for (PairCommand pairCommand : commands) {
+                if(Objects.equals(pairCommand.getVariable(), pairVariable.getVariable())) {
+                    System.out.println(pairCommand.getVariable());
+                    System.out.println(pairVariable.getVariable());
+                    pairCommand.setMemmoryPosition(PairCommand.getLineCount());
+                    System.out.println("variable: " + pairCommand.getVariable());
                 }
-            });
-        });
+            }
+            listAux.add(new PairCommand(pairVariable));
+        }
         commands = Stream.concat(commands.stream(), listAux.stream()).toList();
     }
 

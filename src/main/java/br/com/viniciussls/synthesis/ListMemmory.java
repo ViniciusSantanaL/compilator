@@ -1,5 +1,8 @@
 package br.com.viniciussls.synthesis;
 
+import br.com.viniciussls.analysis.Symbol;
+import br.com.viniciussls.analysis.Token;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,36 +15,33 @@ public class ListMemmory {
         memmoryPositions =  new HashMap<>();
     }
 
-    public Integer allocVariable(String variable, Integer initialValue) {
-        if(memmoryPositions.containsKey(variable)){
-            return memmoryPositions.get(variable).getPositionAux();
+    public void allocVariable(Token tokenVariable) {
+        String variable = tokenVariable.getValue();
+        if(!memmoryPositions.containsKey(variable)) {
+            if(tokenVariable.getSymbol() == Symbol.INTEGER) {
+                memmoryPositions.put(variable, new PairVariable(variable, Integer.valueOf(variable)));
+            } else {
+                memmoryPositions.put(variable, new PairVariable(variable, 0));
+            }
         }
-        int memmoryPositionTemporary = memmoryPositions.size();
-        memmoryPositions.put(variable, new PairVariable(memmoryPositionTemporary, initialValue));
-        return memmoryPositionTemporary;
     }
 
-    public Integer allocConst(Integer constant) {
-        if(memmoryPositions.containsKey(constant.toString())) {
-            return memmoryPositions.get(constant.toString()).getPositionAux();
+    public void allocVariableWithInitialValue(Token tokenVariable, Integer initialValue) {
+        String variable = tokenVariable.getValue();
+        if(!memmoryPositions.containsKey(variable)) {
+            if(tokenVariable.getSymbol() == Symbol.INTEGER) {
+                memmoryPositions.put(variable, new PairVariable(variable,Integer.valueOf(variable)));
+            } else {
+                memmoryPositions.put(variable, new PairVariable(variable, initialValue));
+            }
         }
-        int memmoryPositionTemporary = memmoryPositions.size();
-        memmoryPositions.put(constant.toString(), new PairVariable(memmoryPositionTemporary, constant));
-        return memmoryPositionTemporary;
     }
 
-    public Integer getMemmoryPosition(String variable) {
-        return memmoryPositions.get(variable).getPositionAux();
-    }
 
     public boolean variableExist(String variable) {
         return memmoryPositions.containsKey(variable);
     }
 
-    public void updateInitialValue(String variable, Integer value) {
-        PairVariable pairVariable = memmoryPositions.get(variable);
-        pairVariable.changeInitialValue(value);
-    }
 
 
     public Collection<PairVariable> getMemmoryList() {

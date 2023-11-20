@@ -17,54 +17,53 @@ public class LetCommand implements Command {
     @Override
     public void interpreteCommand(LexicalAnalysis lexicalAnalysis) {
         Integer simpleLine = Integer.parseInt(lexicalAnalysis.getPreviousToken().getValue());
+        GoToRedirect.registerLineNumber(simpleLine, PairCommand.getLineCount());
 
         lexicalAnalysis.nextToken(); // Pula 'let'
-        String leftVariable = lexicalAnalysis.getCurrentToken().getValue();
+        Token leftVariable = lexicalAnalysis.getCurrentToken();
 
         lexicalAnalysis.nextToken(); // Pula o nome da variável
         lexicalAnalysis.nextToken(); // Pula o '='
 
         // Verifica se o lado direito é uma constante e lida com ela.
-        boolean isConst = constValue(lexicalAnalysis, leftVariable, simpleLine);
+        boolean isConst = constValue(lexicalAnalysis, leftVariable);
         if (isConst) {
             return; // Se for uma constante, o método constValue já lidou com isso.
         }
 
         // Pega a posição da memória para a variável à esquerda.
-        Integer leftVariableMemPos = getListMemmory().allocVariable(leftVariable, 0);
+        getListMemmory().allocVariable(leftVariable);
 
         // Verifica se o próximo token é uma variável ou uma expressão.
         Token rightSideToken = lexicalAnalysis.getCurrentToken();
         Symbol nextSymbol = lexicalAnalysis.peekNextToken().getSymbol();
 
-        GoToRedirect.registerLineNumber(simpleLine, PairCommand.getLineCount());
         if (rightSideToken.getSymbol() == Symbol.VARIABLE && nextSymbol == Symbol.ENTER) {
             // Se o lado direito é apenas outra variável.
-            Integer rightVariableMemPos = getListMemmory().allocVariable(rightSideToken.getValue(), 0);
+            getListMemmory().allocVariable(rightSideToken);
             // Gera código para carregar o valor da variável direita e armazenar na esquerda.
-            addToCommandList(StackOperation.push(Operation.LOAD, rightVariableMemPos));
-            addToCommandList(StackOperation.push(Operation.STORE, leftVariableMemPos));
+            addToCommandList(StackOperation.push(Operation.LOAD, rightSideToken.getValue()));
+            addToCommandList(StackOperation.push(Operation.STORE, leftVariable.getValue()));
 
         } else {
             // Se o lado direito é uma expressão aritmética.
-            processArithmeticExpression(lexicalAnalysis, leftVariableMemPos);
+            processArithmeticExpression(lexicalAnalysis, leftVariable.getValue());
         }
     }
 
-    private boolean constValue(LexicalAnalysis lexicalAnalysis, String variable, Integer simpleLine) {
+    private boolean constValue(LexicalAnalysis lexicalAnalysis, Token variable) {
         if(lexicalAnalysis.getCurrentToken().getSymbol() == Symbol.INTEGER) {
             Symbol nextSymbol = lexicalAnalysis.peekNextToken().getSymbol();
             if(nextSymbol == Symbol.ENTER) {
-                Integer constant = Integer.valueOf(lexicalAnalysis.getCurrentToken().getValue()); // get default value
-                if(!getListMemmory().variableExist(variable)) {
-                    getListMemmory().allocVariable(variable, constant); // alloc new variable with default value
+                Token constant = lexicalAnalysis.getCurrentToken(); // get default value
+                if(!getListMemmory().variableExist(variable.getValue())) {
+                    getListMemmory().allocVariableWithInitialValue(variable, Integer.valueOf(constant.getValue())); // alloc new variable with default value
                 } else {
-                    GoToRedirect.registerLineNumber(simpleLine, PairCommand.getLineCount());
-                    Integer memmoryPosition = getListMemmory().allocConst(constant);
-                    Integer variableMemmoryPosition = getListMemmory().allocVariable(variable, 0);
-                    addToCommandList(StackOperation.push(Operation.LOAD, variableMemmoryPosition));
-                    addToCommandList(StackOperation.push(Operation.ADD, memmoryPosition));
-                    addToCommandList(StackOperation.push(Operation.STORE, variableMemmoryPosition));
+                    getListMemmory().allocVariable(variable);
+                    getListMemmory().allocVariable(constant);
+                    addToCommandList(StackOperation.push(Operation.LOAD, variable.getValue()));
+                    addToCommandList(StackOperation.push(Operation.ADD, constant.getValue()));
+                    addToCommandList(StackOperation.push(Operation.STORE, variable.getValue()));
                 }
                 lexicalAnalysis.nextToken(); // jump integer
                 return true;
@@ -73,9 +72,10 @@ public class LetCommand implements Command {
         return false;
     }
 
-    private void processArithmeticExpression(LexicalAnalysis lexicalAnalysis, Integer leftVariableMemPos) {
+    private void processArithmeticExpression(LexicalAnalysis lexicalAnalysis, String leftVariable) {
         // O primeiro operando já foi lido (é uma constante ou uma variável).
-        Integer firstOperandPos = getOperandPosition(lexicalAnalysis.getCurrentToken());
+        getListMemmory().allocVariable(lexicalAnalysis.getCurrentToken());
+        String firstOperandPos = lexicalAnalysis.getCurrentToken().getValue();
 
         // Avança para o operador.
         lexicalAnalysis.nextToken();
@@ -83,27 +83,17 @@ public class LetCommand implements Command {
 
         // Avança para o segundo operando.
         lexicalAnalysis.nextToken();
-        Integer secondOperandPos = getOperandPosition(lexicalAnalysis.getCurrentToken());
+        getListMemmory().allocVariable(lexicalAnalysis.getCurrentToken());
+        String secondOperandPos = lexicalAnalysis.getCurrentToken().getValue();
 
         // Agora, gera o código SML com base no operador.
-        generateArithmeticCode(operator, firstOperandPos, secondOperandPos, leftVariableMemPos, lexicalAnalysis);
+        generateArithmeticCode(operator, firstOperandPos, secondOperandPos, leftVariable, lexicalAnalysis);
 
         // Avança para o próximo token após a expressão aritmética.
         lexicalAnalysis.nextToken();
     }
 
-    private Integer getOperandPosition(Token token) {
-        // Se o token for um número, aloca uma constante.
-        if (token.getSymbol() == Symbol.INTEGER) {
-            Integer value = Integer.valueOf(token.getValue());
-            return getListMemmory().allocConst(value);
-        } else {
-            // Se for uma variável, recupera sua posição de memória.
-            return getListMemmory().allocVariable(token.getValue(), 0);
-        }
-    }
-
-    private void generateArithmeticCode(Symbol operator, Integer firstOperandPos, Integer secondOperandPos, Integer resultPos, LexicalAnalysis lexicalAnalysis) {
+    private void generateArithmeticCode(Symbol operator, String firstOperandPos, String secondOperandPos, String resultPos, LexicalAnalysis lexicalAnalysis) {
         addToCommandList(StackOperation.push(Operation.LOAD, firstOperandPos));
         switch (operator) {
             case ADD:
