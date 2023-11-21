@@ -25,6 +25,7 @@ public class SynthesisExecution {
     }
 
     public void run() {
+        System.out.println("Executando analise...");
         lexicalAnalysis.nextToken();
         while(lexicalAnalysis.getCurrentToken().getSymbol() != Symbol.END) {
             jumpToken();
@@ -32,7 +33,7 @@ public class SynthesisExecution {
         }
         GoToRedirect.updateGotos(commands);
         insertVariables();
-        System.out.println("finalizou");
+        System.out.println("Analise concluída com sucesso!!");
     }
 
     private void jumpToken() {
@@ -53,10 +54,7 @@ public class SynthesisExecution {
         for(PairVariable pairVariable : listMemmory.getMemmoryList()) {
             for (PairCommand pairCommand : commands) {
                 if(Objects.equals(pairCommand.getVariable(), pairVariable.getVariable())) {
-                    System.out.println(pairCommand.getVariable());
-                    System.out.println(pairVariable.getVariable());
                     pairCommand.setMemmoryPosition(PairCommand.getLineCount());
-                    System.out.println("variable: " + pairCommand.getVariable());
                 }
             }
             listAux.add(new PairCommand(pairVariable));

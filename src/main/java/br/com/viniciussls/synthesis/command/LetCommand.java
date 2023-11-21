@@ -56,15 +56,12 @@ public class LetCommand implements Command {
             Symbol nextSymbol = lexicalAnalysis.peekNextToken().getSymbol();
             if(nextSymbol == Symbol.ENTER) {
                 Token constant = lexicalAnalysis.getCurrentToken(); // get default value
-                if(!getListMemmory().variableExist(variable.getValue())) {
-                    getListMemmory().allocVariableWithInitialValue(variable, Integer.valueOf(constant.getValue())); // alloc new variable with default value
-                } else {
-                    getListMemmory().allocVariable(variable);
-                    getListMemmory().allocVariable(constant);
-                    addToCommandList(StackOperation.push(Operation.LOAD, variable.getValue()));
-                    addToCommandList(StackOperation.push(Operation.ADD, constant.getValue()));
-                    addToCommandList(StackOperation.push(Operation.STORE, variable.getValue()));
-                }
+                getListMemmory().allocVariable(variable);
+                getListMemmory().allocVariable(constant);
+                addToCommandList(StackOperation.push(Operation.LOAD, variable.getValue()));
+                addToCommandList(StackOperation.push(Operation.ADD, constant.getValue()));
+                addToCommandList(StackOperation.push(Operation.STORE, variable.getValue()));
+
                 lexicalAnalysis.nextToken(); // jump integer
                 return true;
             }
