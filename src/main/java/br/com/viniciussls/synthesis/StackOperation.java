@@ -17,4 +17,15 @@ public class StackOperation {
             return new PairCommand(operation, variable);
         }
     }
+
+    public static PairCommand pushWithMemmoryPosition(Operation operation, Integer memmoryPositon) {
+        if(stack.contains(operation)) {
+            return null;
+        } else {
+            if(operation == Operation.STORE) {
+                stack.clear();
+            }
+            return new PairCommand(operation, memmoryPositon);
+        }
+    }
 }

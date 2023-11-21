@@ -63,7 +63,7 @@ public class IfCommand implements Command {
                 addToCommandList(StackOperation.push(Operation.LOAD, leftMemPos));
                 addToCommandList(StackOperation.push(Operation.SUBTRACT, rightMemPos));
                 int branchOverLine = PairCommand.getLineCount() + 2; // Próxima linha depois do BRANCHZERO.
-                addToCommandList(StackOperation.push(Operation.BRANCHZERO, String.valueOf(branchOverLine)));
+                addToCommandList(StackOperation.pushWithMemmoryPosition(Operation.BRANCHZERO, branchOverLine));
                 GoToRedirect.addGotoForUpdate(PairCommand.getLineCount(), goToLine);
                 addToCommandList(StackOperation.push(Operation.BRANCH, goToLine.toString()));
                 break;

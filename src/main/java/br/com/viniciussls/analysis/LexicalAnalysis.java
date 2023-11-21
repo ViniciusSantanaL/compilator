@@ -10,7 +10,7 @@ public class LexicalAnalysis {
 
     private static final List<Character> ignoreChars = Arrays.asList(' ', '\r', '\t');
 
-    private static final List<Character> operators = Arrays.asList('-','=', '+', '*', '/', '<', '>', '%', '\n');
+    private static final List<Character> operators = Arrays.asList('-','=', '+', '*', '/', '<', '>', '%', '!','\n');
 
     private final String code;
 

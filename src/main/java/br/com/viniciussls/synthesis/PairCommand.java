@@ -21,6 +21,14 @@ public class PairCommand {
         commandSize++;
     }
 
+    public PairCommand(Operation operation, Integer  memmoryPosition) {
+        this.operation = operation;
+        this.memmoryPosition = memmoryPosition;
+        this.lineNumber = commandSize;
+        commandSize++;
+    }
+
+
     public PairCommand(PairVariable pairVariable) {
         this.pairVariable = pairVariable;
         this.lineNumber = commandSize;
